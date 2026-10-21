@@ -1,6 +1,6 @@
 -- Script de GUI para Roblox
--- Botones "Freeze Trade" y "Force Accept" (sin función)
--- Equis para cerrar + ventana arrastrable + crédito RGB + borde RGB
+-- Ventana ajustada, sin espacio extra abajo
+-- Efecto al presionar botones + animación RGB
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -13,11 +13,11 @@ screenGui.Name = "TradeGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Frame contenedor principal
+-- Frame contenedor principal (Altura reducida a 180)
 local frame = Instance.new("Frame")
 frame.Name = "MainFrame"
-frame.Size = UDim2.new(0, 280, 0, 220)
-frame.Position = UDim2.new(0.5, -140, 0.5, -110)
+frame.Size = UDim2.new(0, 280, 0, 180)
+frame.Position = UDim2.new(0.5, -140, 0.5, -90)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
 frame.Active = true
@@ -27,12 +27,12 @@ local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = frame
 
--- Borde RGB usando UIStroke (Animado)
+-- Borde RGB
 local rgbStroke = Instance.new("UIStroke")
 rgbStroke.Thickness = 2
 rgbStroke.Parent = frame
 
--- Crédito RGB "BY NYAN CAT :P" (esquina superior izquierda)
+-- Crédito RGB
 local creditLabel = Instance.new("TextLabel")
 creditLabel.Name = "CreditLabel"
 creditLabel.Size = UDim2.new(0, 160, 0, 20)
@@ -49,10 +49,10 @@ creditLabel.Parent = frame
 local freezeButton = Instance.new("TextButton")
 freezeButton.Name = "FreezeTradeButton"
 freezeButton.Size = UDim2.new(0, 240, 0, 50)
-freezeButton.Position = UDim2.new(0.5, -120, 0, 45)
-freezeButton.BackgroundColor3 = Color3.fromRGB(230, 200, 0) -- Amarillo tipo imagen
+freezeButton.Position = UDim2.new(0.5, -120, 0, 40)
+freezeButton.BackgroundColor3 = Color3.fromRGB(230, 200, 0)
 freezeButton.Text = "FREEZE TRADE"
-freezeButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Texto negro
+freezeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 freezeButton.TextSize = 20
 freezeButton.Font = Enum.Font.GothamBold
 freezeButton.BorderSizePixel = 0
@@ -66,10 +66,10 @@ corner1.Parent = freezeButton
 local forceButton = Instance.new("TextButton")
 forceButton.Name = "ForceAcceptButton"
 forceButton.Size = UDim2.new(0, 240, 0, 50)
-forceButton.Position = UDim2.new(0.5, -120, 0, 105)
-forceButton.BackgroundColor3 = Color3.fromRGB(0, 200, 220) -- Celeste tipo imagen
+forceButton.Position = UDim2.new(0.5, -120, 0, 100)
+forceButton.BackgroundColor3 = Color3.fromRGB(0, 200, 220)
 forceButton.Text = "FORCE ACCEPT"
-forceButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Texto negro
+forceButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 forceButton.TextSize = 20
 forceButton.Font = Enum.Font.GothamBold
 forceButton.BorderSizePixel = 0
@@ -79,7 +79,7 @@ local corner2 = Instance.new("UICorner")
 corner2.CornerRadius = UDim.new(0, 8)
 corner2.Parent = forceButton
 
--- Equis para cerrar (Estilo Rojo)
+-- Equis para cerrar
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 30, 0, 30)
@@ -96,18 +96,38 @@ local corner3 = Instance.new("UICorner")
 corner3.CornerRadius = UDim.new(0, 6)
 corner3.Parent = closeButton
 
+-- Efecto de botón presionado (0.2 segundos)
+local function setupButtonEffect(button)
+    button.MouseButton1Down:Connect(function()
+        button.BackgroundColor3 = button.BackgroundColor3:Lerp(Color3.new(0, 0, 0), 0.4)
+    end)
+    
+    local function resetColor()
+        task.wait(0.2)
+        if button.Name == "FreezeTradeButton" then
+            button.BackgroundColor3 = Color3.fromRGB(230, 200, 0)
+        elseif button.Name == "ForceAcceptButton" then
+            button.BackgroundColor3 = Color3.fromRGB(0, 200, 220)
+        end
+    end
+
+    button.MouseButton1Up:Connect(resetColor)
+    button.MouseLeave:Connect(resetColor)
+end
+
+setupButtonEffect(freezeButton)
+setupButtonEffect(forceButton)
+
 -- Animación RGB (Borde y Texto)
 local hue = 0
 local rgbConnection = RunService.RenderStepped:Connect(function(dt)
     hue = (hue + dt * 0.3) % 1
     local currentColor = Color3.fromHSV(hue, 1, 1)
-    
-    -- Animamos el borde y el texto
     rgbStroke.Color = currentColor
     creditLabel.TextColor3 = currentColor
 end)
 
--- Cerrar y cortar la animación RGB
+-- Cerrar ventana
 closeButton.MouseButton1Click:Connect(function()
     if rgbConnection then
         rgbConnection:Disconnect()
