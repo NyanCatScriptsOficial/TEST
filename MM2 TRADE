@@ -1,0 +1,148 @@
+-- Script de GUI para Roblox
+-- Botones "Freeze Trade" y "Forze Trade" (sin función)
+-- Equis para cerrar + ventana arrastrable + crédito RGB
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TradeGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Frame contenedor (más grande)
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 280, 0, 220)
+frame.Position = UDim2.new(0.5, -140, 0.5, -110)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = frame
+
+-- Crédito RGB "BY NYAN CAT :P" (esquina superior izquierda)
+local creditLabel = Instance.new("TextLabel")
+creditLabel.Name = "CreditLabel"
+creditLabel.Size = UDim2.new(0, 160, 0, 20)
+creditLabel.Position = UDim2.new(0, 8, 0, 6)
+creditLabel.BackgroundTransparency = 1
+creditLabel.Text = "BY NYAN CAT :P"
+creditLabel.TextSize = 14
+creditLabel.Font = Enum.Font.GothamBold
+creditLabel.TextXAlignment = Enum.TextXAlignment.Left
+creditLabel.Parent = frame
+
+-- Animación RGB del texto
+local hue = 0
+local rgbConnection = RunService.RenderStepped:Connect(function(dt)
+    hue = (hue + dt * 0.3) % 1
+    creditLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+end)
+
+-- Botón Freeze Trade
+local freezeButton = Instance.new("TextButton")
+freezeButton.Name = "FreezeTradeButton"
+freezeButton.Size = UDim2.new(0, 230, 0, 50)
+freezeButton.Position = UDim2.new(0.5, -115, 0, 40)
+freezeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+freezeButton.Text = "Freeze Trade"
+freezeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+freezeButton.TextSize = 22
+freezeButton.Font = Enum.Font.GothamBold
+freezeButton.BorderSizePixel = 0
+freezeButton.Parent = frame
+
+local corner1 = Instance.new("UICorner")
+corner1.CornerRadius = UDim.new(0, 8)
+corner1.Parent = freezeButton
+
+-- Botón Forze Trade
+local forzeButton = Instance.new("TextButton")
+forzeButton.Name = "ForzeTradeButton"
+forzeButton.Size = UDim2.new(0, 230, 0, 50)
+forzeButton.Position = UDim2.new(0.5, -115, 0, 110)
+forzeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+forzeButton.Text = "Forze Trade"
+forzeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+forzeButton.TextSize = 22
+forzeButton.Font = Enum.Font.GothamBold
+forzeButton.BorderSizePixel = 0
+forzeButton.Parent = frame
+
+local corner2 = Instance.new("UICorner")
+corner2.CornerRadius = UDim.new(0, 8)
+corner2.Parent = forzeButton
+
+-- Equis para cerrar
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 26, 0, 26)
+closeButton.Position = UDim2.new(1, -32, 0, 6)
+closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 18
+closeButton.Font = Enum.Font.GothamBold
+closeButton.BorderSizePixel = 0
+closeButton.Parent = frame
+
+local corner3 = Instance.new("UICorner")
+corner3.CornerRadius = UDim.new(0, 6)
+corner3.Parent = closeButton
+
+-- Cerrar y cortar la animación RGB
+closeButton.MouseButton1Click:Connect(function()
+    if rgbConnection then
+        rgbConnection:Disconnect()
+    end
+    screenGui:Destroy()
+end)
+
+-- Arrastrar ventana (ratón y dedo)
+local dragging = false
+local dragInput = nil
+local dragStart = nil
+local startPos = nil
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(
+        startPos.X.Scale, startPos.X.Offset + delta.X,
+        startPos.Y.Scale, startPos.Y.Offset + delta.Y
+    )
+end
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateDrag(input)
+    end
+end)
