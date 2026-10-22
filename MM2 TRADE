@@ -1,5 +1,5 @@
--- Script de GUI para Roblox - VERSIÓN ÉPICA
--- Efectos, partículas, sonidos y animaciones fluidas
+-- Script de GUI para Roblox - VERSIÓN DEFINITIVA (PERFECTA)
+-- Efectos, partículas, sonidos, emojis, sombras y estado.
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -10,23 +10,36 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 -- SONIDOS
 local hoverSound = Instance.new("Sound")
-hoverSound.SoundId = "rbxassetid://6863145671" -- Sonido suave de hover
+hoverSound.SoundId = "rbxassetid://6863145671"
 hoverSound.Volume = 0.5
 
 local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://6863145671" -- Sonido de clic (mismo por ahora, sube el volumen)
+clickSound.SoundId = "rbxassetid://6863145671"
 clickSound.Volume = 1
 
 local closeSound = Instance.new("Sound")
 closeSound.SoundId = "rbxassetid://6863145671"
 closeSound.Volume = 1
-closeSound.PlaybackSpeed = 0.8 -- Tono más grave al cerrar
+closeSound.PlaybackSpeed = 0.8
 
 -- CONTENEDOR PRINCIPAL
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "EpicTradeGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
+
+-- SOMBRA DE LA VENTANA (Drop Shadow)
+local shadow = Instance.new("ImageLabel")
+shadow.Name = "Shadow"
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Position = UDim2.new(0, -10, 0, -10)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217" -- ID de sombra suave
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.5
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+shadow.Parent = screenGui
 
 local frame = Instance.new("Frame")
 frame.Name = "MainFrame"
@@ -38,9 +51,26 @@ frame.Active = true
 frame.Parent = screenGui
 frame.ClipsDescendants = false
 
+-- Sincronizar sombra con la ventana
+frame:GetPropertyChangedSignal("Position"):Connect(function()
+    shadow.Position = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset - 10, frame.Position.Y.Scale, frame.Position.Y.Offset - 10)
+end)
+frame:GetPropertyChangedSignal("Size"):Connect(function()
+    shadow.Size = UDim2.new(frame.Size.X.Scale, frame.Size.X.Offset + 20, frame.Size.Y.Scale, frame.Size.Y.Offset + 20)
+end)
+
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = frame
+
+-- FONDO INVISIBLE PARA ARRASTRAR
+local dragHitbox = Instance.new("TextButton")
+dragHitbox.Name = "DragHitbox"
+dragHitbox.Size = UDim2.new(1, 0, 1, 0)
+dragHitbox.BackgroundTransparency = 1
+dragHitbox.Text = ""
+dragHitbox.ZIndex = 1
+dragHitbox.Parent = frame
 
 -- EFECTO DE GRADIENTE INTERNO
 local gradient = Instance.new("UIGradient")
@@ -51,23 +81,24 @@ gradient.Color = ColorSequence.new{
 gradient.Rotation = 90
 gradient.Parent = frame
 
--- BORDE RGB CON BRILLO
+-- BORDE RGB
 local rgbStroke = Instance.new("UIStroke")
 rgbStroke.Thickness = 2
 rgbStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 rgbStroke.Parent = frame
 
--- TEXTO DE CRÉDITO CON SOMBRA
+-- CRÉDITO CON EMOJI
 local creditLabel = Instance.new("TextLabel")
 creditLabel.Name = "CreditLabel"
-creditLabel.Size = UDim2.new(0, 160, 0, 20)
+creditLabel.Size = UDim2.new(0, 180, 0, 20)
 creditLabel.Position = UDim2.new(0, 12, 0, 10)
 creditLabel.BackgroundTransparency = 1
-creditLabel.Text = "BY NYAN CAT :P"
+creditLabel.Text = "🐱 BY NYAN CAT :P"
 creditLabel.TextSize = 14
 creditLabel.Font = Enum.Font.GothamBlack
 creditLabel.TextXAlignment = Enum.TextXAlignment.Left
 creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+creditLabel.ZIndex = 2
 creditLabel.Parent = frame
 
 local creditStroke = Instance.new("UIStroke")
@@ -75,26 +106,50 @@ creditStroke.Thickness = 1
 creditStroke.Color = Color3.fromRGB(0, 0, 0)
 creditStroke.Parent = creditLabel
 
--- FUNCIÓN PARA CREAR BOTONES PRO
+-- TEXTO DE ESTADO (Esquina inferior)
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "StatusLabel"
+statusLabel.Size = UDim2.new(1, -20, 0, 15)
+statusLabel.Position = UDim2.new(0, 10, 1, -20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "🟢 SYSTEM STATUS: ONLINE / READY"
+statusLabel.TextSize = 12
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+statusLabel.ZIndex = 2
+statusLabel.Parent = frame
+
+-- Efecto de parpadeo para el circulito verde
+task.spawn(function()
+    while statusLabel.Parent do
+        statusLabel.Text = "🔴 SYSTEM STATUS: ONLINE / READY"
+        task.wait(1)
+        statusLabel.Text = "🟢 SYSTEM STATUS: ONLINE / READY"
+        task.wait(1)
+    end
+end)
+
+-- FUNCIÓN BOTONES
 local function createEpicButton(name, text, color, posY)
     local btn = Instance.new("TextButton")
     btn.Name = name
-    btn.Size = UDim2.new(0, 240, 0, 48)
+    btn.Size = UDim2.new(0, 240, 0, 44)
     btn.Position = UDim2.new(0.5, -120, 0, posY)
     btn.BackgroundColor3 = color
     btn.Text = text
     btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-    btn.TextSize = 20
+    btn.TextSize = 18
     btn.Font = Enum.Font.GothamBlack
     btn.BorderSizePixel = 0
-    btn.AutoButtonColor = false -- Desactivamos el efecto por defecto de Roblox para usar el nuestro
+    btn.AutoButtonColor = false
+    btn.ZIndex = 3
     btn.Parent = frame
 
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btn
 
-    -- Brillo interno del botón
     local btnGradient = Instance.new("UIGradient")
     btnGradient.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -107,21 +162,19 @@ local function createEpicButton(name, text, color, posY)
     }
     btnGradient.Parent = btn
 
-    -- Sombra del botón
     local btnStroke = Instance.new("UIStroke")
     btnStroke.Color = Color3.fromRGB(0, 0, 0)
     btnStroke.Thickness = 1
     btnStroke.Transparency = 0.5
     btnStroke.Parent = btn
 
-    -- EFECTO DE CLIC (Destello)
     local function playFlashEffect()
         local flash = Instance.new("Frame")
         flash.Size = UDim2.new(1, 0, 1, 0)
         flash.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         flash.BackgroundTransparency = 0.5
         flash.BorderSizePixel = 0
-        flash.ZIndex = 5
+        flash.ZIndex = 4
         flash.Parent = btn
 
         local flashCorner = Instance.new("UICorner")
@@ -138,11 +191,9 @@ local function createEpicButton(name, text, color, posY)
         end)
     end
 
-    -- ANIMACIONES
     local originalSize = btn.Size
-    local hoverSize = UDim2.new(0, 245, 0, 50)
+    local hoverSize = UDim2.new(0, 245, 0, 46)
     
-    -- Hover In
     btn.MouseEnter:Connect(function()
         if not UserInputService.TouchEnabled then
             hoverSound:Play()
@@ -150,14 +201,12 @@ local function createEpicButton(name, text, color, posY)
         end
     end)
     
-    -- Hover Out
     btn.MouseLeave:Connect(function()
         if not UserInputService.TouchEnabled then
             TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = originalSize}):Play()
         end
     end)
 
-    -- Presionar (Efecto oscuro 0.2s + destello)
     local isPressed = false
     btn.MouseButton1Down:Connect(function()
         if isPressed then return end
@@ -166,8 +215,7 @@ local function createEpicButton(name, text, color, posY)
         clickSound:Play()
         playFlashEffect()
         
-        -- Efecto de escala al presionar (se hace un poco más pequeño)
-        TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 230, 0, 45)}):Play()
+        TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 230, 0, 41)}):Play()
         btn.BackgroundColor3 = color:Lerp(Color3.new(0, 0, 0), 0.3)
     end)
     
@@ -186,22 +234,23 @@ local function createEpicButton(name, text, color, posY)
     return btn
 end
 
--- CREANDO BOTONES
-local freezeButton = createEpicButton("FreezeTradeButton", "FREEZE TRADE", Color3.fromRGB(230, 200, 0), 45)
-local forceButton = createEpicButton("ForceAcceptButton", "FORCE ACCEPT", Color3.fromRGB(0, 200, 220), 105)
+-- CREANDO BOTONES CON EMOJIS
+local freezeButton = createEpicButton("FreezeTradeButton", "❄️ FREEZE TRADE", Color3.fromRGB(230, 200, 0), 40)
+local forceButton = createEpicButton("ForceAcceptButton", "⚡ FORCE ACCEPT", Color3.fromRGB(0, 200, 220), 95)
 
--- BOTÓN DE CERRAR (X)
+-- BOTÓN DE CERRAR
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 30, 0, 30)
 closeButton.Position = UDim2.new(1, -40, 0, 10)
 closeButton.BackgroundColor3 = Color3.fromRGB(230, 50, 50)
-closeButton.Text = "X"
+closeButton.Text = "✖"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextSize = 20
+closeButton.TextSize = 18
 closeButton.Font = Enum.Font.GothamBlack
 closeButton.BorderSizePixel = 0
 closeButton.AutoButtonColor = false
+closeButton.ZIndex = 3
 closeButton.Parent = frame
 
 local closeCorner = Instance.new("UICorner")
@@ -221,7 +270,7 @@ closeButton.MouseButton1Up:Connect(function()
     TweenService:Create(closeButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 30, 0, 30)}):Play()
 end)
 
--- ANIMACIÓN RGB MÁGICA (Late y cambia de color)
+-- ANIMACIÓN RGB
 local hue = 0
 local tick = 0
 local rgbConnection = RunService.RenderStepped:Connect(function(dt)
@@ -232,9 +281,8 @@ local rgbConnection = RunService.RenderStepped:Connect(function(dt)
     rgbStroke.Color = currentColor
     creditLabel.TextColor3 = currentColor
     
-    -- El borde "respira" (late)
-    local pulse = (math.sin(tick * 5) + 1) / 2 -- Valor entre 0 y 1
-    rgbStroke.Thickness = 1.5 + (pulse * 1.5) -- Grosor entre 1.5 y 3
+    local pulse = (math.sin(tick * 5) + 1) / 2
+    rgbStroke.Thickness = 1.5 + (pulse * 1.5)
 end)
 
 -- FUNCIONALIDAD DE CERRAR
@@ -242,18 +290,25 @@ closeButton.MouseButton1Click:Connect(function()
     closeSound:Play()
     if rgbConnection then rgbConnection:Disconnect() end
     
-    -- Animación de salida (la ventana se achica y desaparece)
     local exitTween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0)
     })
+    
+    -- También animamos la sombra
+    TweenService:Create(shadow, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        ImageTransparency = 1
+    }):Play()
+    
     exitTween:Play()
     exitTween.Completed:Connect(function()
         screenGui:Destroy()
     end)
 end)
 
--- ARRASTRAR VENTANA (Con bloqueo para que no interfiera con los botones)
+-- ARRASTRAR VENTANA
 local dragging = false
 local dragInput = nil
 local dragStart = nil
@@ -267,25 +322,22 @@ local function updateDrag(input)
     )
 end
 
-frame.InputBegan:Connect(function(input)
+dragHitbox.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
-        -- Solo arrastramos si no estamos tocando un botón
-        if input.Target == frame or input.Target == creditLabel then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
 
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
     end
 end)
 
-frame.InputChanged:Connect(function(input)
+dragHitbox.InputChanged:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseMovement
         or input.UserInputType == Enum.UserInputType.Touch then
         dragInput = input
@@ -298,7 +350,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Arreglo de rendimiento: Destruir sonidos cuando se cierre
+-- Arreglo de rendimiento
 screenGui.AncestryChanged:Connect(function()
     if not screenGui.Parent then
         hoverSound:Destroy()
