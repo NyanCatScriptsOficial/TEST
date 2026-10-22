@@ -110,7 +110,7 @@ statusLabel.Parent = frame
 -- Efecto de parpadeo
 task.spawn(function()
     while statusLabel.Parent do
-        statusLabel.Text = "🔴 SYSTEM STATUS: ONLINE / READY"
+        statusLabel.Text = "🟢 SYSTEM STATUS: ONLINE / READY"
         task.wait(1)
         statusLabel.Text = "🟢 SYSTEM STATUS: ONLINE / READY"
         task.wait(1)
