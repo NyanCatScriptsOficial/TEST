@@ -1,5 +1,5 @@
 -- Script de GUI para Roblox - VERSIÓN DEFINITIVA (PERFECTA)
--- Efectos, partículas, sonidos, emojis, sombras y estado.
+-- Colores intercambiados, sin emoji de gato, SOMBRA ARREGLADA.
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -28,19 +28,6 @@ screenGui.Name = "EpicTradeGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- SOMBRA DE LA VENTANA (Drop Shadow)
-local shadow = Instance.new("ImageLabel")
-shadow.Name = "Shadow"
-shadow.Size = UDim2.new(1, 20, 1, 20)
-shadow.Position = UDim2.new(0, -10, 0, -10)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217" -- ID de sombra suave
-shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-shadow.ImageTransparency = 0.5
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-shadow.Parent = screenGui
-
 local frame = Instance.new("Frame")
 frame.Name = "MainFrame"
 frame.Size = UDim2.new(0, 280, 0, 180)
@@ -51,17 +38,17 @@ frame.Active = true
 frame.Parent = screenGui
 frame.ClipsDescendants = false
 
--- Sincronizar sombra con la ventana
-frame:GetPropertyChangedSignal("Position"):Connect(function()
-    shadow.Position = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset - 10, frame.Position.Y.Scale, frame.Position.Y.Offset - 10)
-end)
-frame:GetPropertyChangedSignal("Size"):Connect(function()
-    shadow.Size = UDim2.new(frame.Size.X.Scale, frame.Size.X.Offset + 20, frame.Size.Y.Scale, frame.Size.Y.Offset + 20)
-end)
-
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = frame
+
+-- NUEVA SOMBRA (UIStroke grueso y transparente)
+local shadowStroke = Instance.new("UIStroke")
+shadowStroke.Color = Color3.fromRGB(0, 0, 0)
+shadowStroke.Thickness = 6
+shadowStroke.Transparency = 0.4
+shadowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+shadowStroke.Parent = frame
 
 -- FONDO INVISIBLE PARA ARRASTRAR
 local dragHitbox = Instance.new("TextButton")
@@ -87,13 +74,13 @@ rgbStroke.Thickness = 2
 rgbStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 rgbStroke.Parent = frame
 
--- CRÉDITO CON EMOJI
+-- CRÉDITO
 local creditLabel = Instance.new("TextLabel")
 creditLabel.Name = "CreditLabel"
 creditLabel.Size = UDim2.new(0, 180, 0, 20)
 creditLabel.Position = UDim2.new(0, 12, 0, 10)
 creditLabel.BackgroundTransparency = 1
-creditLabel.Text = "🐱 BY NYAN CAT :P"
+creditLabel.Text = "BY NYAN CAT :P"
 creditLabel.TextSize = 14
 creditLabel.Font = Enum.Font.GothamBlack
 creditLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -106,7 +93,7 @@ creditStroke.Thickness = 1
 creditStroke.Color = Color3.fromRGB(0, 0, 0)
 creditStroke.Parent = creditLabel
 
--- TEXTO DE ESTADO (Esquina inferior)
+-- TEXTO DE ESTADO
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "StatusLabel"
 statusLabel.Size = UDim2.new(1, -20, 0, 15)
@@ -120,7 +107,7 @@ statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 statusLabel.ZIndex = 2
 statusLabel.Parent = frame
 
--- Efecto de parpadeo para el circulito verde
+-- Efecto de parpadeo
 task.spawn(function()
     while statusLabel.Parent do
         statusLabel.Text = "🔴 SYSTEM STATUS: ONLINE / READY"
@@ -234,9 +221,9 @@ local function createEpicButton(name, text, color, posY)
     return btn
 end
 
--- CREANDO BOTONES CON EMOJIS
-local freezeButton = createEpicButton("FreezeTradeButton", "❄️ FREEZE TRADE", Color3.fromRGB(230, 200, 0), 40)
-local forceButton = createEpicButton("ForceAcceptButton", "⚡ FORCE ACCEPT", Color3.fromRGB(0, 200, 220), 95)
+-- CREANDO BOTONES
+local forceButton = createEpicButton("ForceAcceptButton", "⚡ FORCE ACCEPT", Color3.fromRGB(0, 200, 220), 40)
+local freezeButton = createEpicButton("FreezeTradeButton", "❄️ FREEZE TRADE", Color3.fromRGB(230, 200, 0), 95)
 
 -- BOTÓN DE CERRAR
 local closeButton = Instance.new("TextButton")
@@ -294,13 +281,6 @@ closeButton.MouseButton1Click:Connect(function()
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0)
     })
-    
-    -- También animamos la sombra
-    TweenService:Create(shadow, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        ImageTransparency = 1
-    }):Play()
     
     exitTween:Play()
     exitTween.Completed:Connect(function()
