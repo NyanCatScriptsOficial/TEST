@@ -1,4 +1,4 @@
--- Script de GUI para Roblox - VERSIÓN DEFINITIVA
+-- Script de  DELTA GUI para Roblox - VERSIÓN DEFINITIVA
 -- Textos en su lugar, colores intercambiados, sin parpadeo.
 
 local Players = game:GetService("Players")
