@@ -1,4 +1,4 @@
--- Script de GUI para Roblox - VERSIÓN DEFINITIVA
+-- Script de bb GUI para Roblox - VERSIÓN DEFINITIVA
 -- Siempre arriba de otros menús (DisplayOrder)
 
 local Players = game:GetService("Players")
