@@ -1,5 +1,5 @@
--- Script de DELTA GUI para Roblox - VERSIÓN DEFINITIVA
--- Textos en su lugar, colores intercambiados, sin parpadeo.
+-- Script de GUI para Roblox - VERSIÓN DEFINITIVA
+-- Siempre arriba de otros menús (DisplayOrder)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -26,6 +26,7 @@ closeSound.PlaybackSpeed = 0.8
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "EpicTradeGui"
 screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 9999 -- <--- AQUÍ ESTÁ LA MAGIA: Siempre arriba
 screenGui.Parent = playerGui
 
 local frame = Instance.new("Frame")
@@ -93,7 +94,7 @@ creditStroke.Thickness = 1
 creditStroke.Color = Color3.fromRGB(0, 0, 0)
 creditStroke.Parent = creditLabel
 
--- TEXTO DE ESTADO (Fijo en verde, sin parpadeo)
+-- TEXTO DE ESTADO
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "StatusLabel"
 statusLabel.Size = UDim2.new(1, -20, 0, 15)
@@ -211,10 +212,8 @@ local function createEpicButton(name, text, color, posY)
     return btn
 end
 
--- CREANDO BOTONES (Textos iguales, colores intercambiados)
--- Arriba: Freeze Trade (Ahora Azul)
+-- CREANDO BOTONES
 local freezeButton = createEpicButton("FreezeTradeButton", "❄️ FREEZE TRADE", Color3.fromRGB(0, 200, 220), 40)
--- Abajo: Force Accept (Ahora Amarillo)
 local forceButton = createEpicButton("ForceAcceptButton", "⚡ FORCE ACCEPT", Color3.fromRGB(230, 200, 0), 95)
 
 -- BOTÓN DE CERRAR
